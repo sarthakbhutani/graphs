@@ -1,17 +1,11 @@
-// addEdgeXX
-// displayXX
-// searchVertexXX
-// removeEdge
-// removeVertex
-// hasPath
-// allPath print
-// hamintonian
 // surrounded regions dfs
 // bfs
 // gcc
 
 #include <iostream>
 #include <vector>
+#include <string>
+
 using namespace std;
 
 class Edge
@@ -76,8 +70,8 @@ void removeEdge(int u, int v)
 
     if (vIdx != -1)
     {
-        graph.erase(graph[u].begin() + uIdx);
-        graph.erase(graph[v].begin() + vIdx);
+        graph[u].erase(graph[u].begin() + uIdx);
+        graph[v].erase(graph[v].begin() + vIdx);
     }
 }
 
@@ -87,6 +81,74 @@ void removeVertex(int u)
     {
         removeEdge(u, graph[u][i]->v);
     }
+}
+
+bool hasPath(int src, int dest, vector<bool> &vis, string ans)
+{
+
+    if (src == dest)
+    {
+        cout << ans << endl;
+        return true;
+    }
+    bool res = false;
+    vis[src] = true;
+    for (int i = 0; i < graph[src].size(); i++)
+    {
+        int v = graph[src][i]->v;
+        if (!vis[v])
+            res = res || hasPath(v, dest, vis, ans + to_string(v));
+    }
+    return res;
+}
+
+//dfs allPaths
+int allPath(int src, int dest, vector<bool> &vis, string ans)
+{
+    //bc
+    if (src == dest)
+    {
+        cout << ans + to_string(dest) << endl;
+        cout << "found" << endl;
+        return 1;
+    }
+    int count = 0;
+    vis[src] = true;
+    for (Edge *e : graph[src])
+    {
+        int v = e->v;
+        if (!vis[v])
+            count += allPath(v, dest, vis, ans + to_string(src) + " ");
+    }
+    vis[src] = false;
+    return count;
+}
+
+void HamintonianPath(int osrc, int src, vector<bool> &vis, int count, string ans)
+{
+    if (count == --n)
+    {
+        if (searchVertex(osrc, src))
+        {
+            cout << "Hamintonian Cycle" << endl;
+        }
+        else
+        {
+            cout << "Hamintonian Path" << endl;
+        }
+        cout << ans + to_string(src) << endl;
+        return;
+    }
+    vis[src] = true;
+    for (Edge *ele : graph[src])
+    {
+        int v = ele->v;
+        if (!vis[v])
+        {
+            HamintonianPath(osrc, v, vis, count + 1, ans + to_string(src) + " ");
+        }
+    }
+    vis[src] = false;
 }
 
 void solve()
@@ -105,6 +167,12 @@ void solve()
     addEdge(2, 8, 3);
 
     display();
+    cout << "hasPath?" << endl;
+    vector<bool> vis(n, false);
+    // bool hasPathVar = false;
+    // hasPathVar = hasPath(0, 6, vis, "");
+    // cout << hasPathVar<<endl;
+    cout << allPath(0, 6, vis, "");
 }
 
 int main()
