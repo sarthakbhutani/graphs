@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <queue>
 
 using namespace std;
 
@@ -126,7 +127,7 @@ int allPath(int src, int dest, vector<bool> &vis, string ans)
 
 void HamintonianPath(int osrc, int src, vector<bool> &vis, int count, string ans)
 {
-    if (count == --n)
+    if (count == n - 1)
     {
         if (searchVertex(osrc, src))
         {
@@ -151,6 +152,52 @@ void HamintonianPath(int osrc, int src, vector<bool> &vis, int count, string ans
     vis[src] = false;
 }
 
+//bfs
+void bfs(int src, vector<bool> &vis)
+{
+    queue<int> que;
+    que.push(src);
+    int level = 0;
+
+    while (que.size() != 0)
+    {
+        int size = que.size();
+        if (size-- > 0)
+        {
+            int rvtx = que.front();
+            que.pop();
+            if (vis[rvtx])
+            {
+                cout << "cycle found wrt" << to_string(src) << " at vertex " << to_string(rvtx) << endl;
+                continue;
+            }
+
+            vis[rvtx] = true;
+            for (Edge *ele : graph[rvtx])
+            {
+                if (!vis[ele->v])
+                    que.push(ele->v);
+            }
+        }
+        level++;
+    }
+}
+
+int gcc()
+{
+    vector<bool> vis(n, false);
+    int count = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (!vis[i])
+        {
+            bfs(i, vis);
+            count++;
+        }
+    }
+    return count;
+}
+
 void solve()
 {
     addEdge(0, 1, 10);
@@ -167,12 +214,14 @@ void solve()
     addEdge(2, 8, 3);
 
     display();
-    cout << "hasPath?" << endl;
+    // cout << "hasPath?" << endl;
     vector<bool> vis(n, false);
     // bool hasPathVar = false;
     // hasPathVar = hasPath(0, 6, vis, "");
     // cout << hasPathVar<<endl;
-    cout << allPath(0, 6, vis, "");
+    // cout << allPath(0, 6, vis, "");
+    // bfs(0,vis);
+    cout << gcc();
 }
 
 int main()
